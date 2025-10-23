@@ -4,6 +4,10 @@ local custom_items = {
         [1852185] = "Obducite",
     },
 
+    veiled_crystal = {
+        [152877] = "Veiled Crystal",
+    },
+
     event_items = {
         [1930727] = "Treasure Bag",
         [1930725] = "Treasure Bag",

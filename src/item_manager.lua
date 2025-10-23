@@ -213,6 +213,13 @@ function ItemManager.check_want_item(item, ignore_distance)
       return settings.obducite
    end
    
+   -- Check for Veiled Crystal BEFORE general crafting check to prevent interference
+   local is_veiled_crystal = CustomItems.veiled_crystal[id]
+   if is_veiled_crystal then
+      -- Only pick up if veiled_crystal toggle is enabled
+      return settings.veiled_crystal
+   end
+   
    local is_consumable_item =
       (settings.boss_items and CustomItems.boss_items[id]) or
       (settings.rare_elixirs and CustomItems.rare_elixirs[id]) or

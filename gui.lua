@@ -91,6 +91,7 @@ gui.elements = {
       quest_items_toggle = checkbox:new(false, get_hash(plugin_label .. "_quest_items_toggle")),
       crafting_items_toggle = checkbox:new(false, get_hash(plugin_label .. "_crafting_items_toggle")),
       obducite_toggle = checkbox:new(false, get_hash(plugin_label .. "_obducite_toggle")),
+      veiled_crystal_toggle = checkbox:new(false, get_hash(plugin_label .. "_veiled_crystal_toggle")),
       boss_items_toggle = checkbox:new(false, get_hash(plugin_label .. "_boss_items_toggle")),
       rare_elixir_items_toggle = checkbox:new(false, get_hash(plugin_label .. "_rare_elixir_items_toggle")),
       basic_elixir_items_toggle = checkbox:new(false, get_hash(plugin_label .. "_basic_elixir_items_toggle")),
@@ -260,6 +261,7 @@ function gui.render()
          "Do you want to pickup Quest items, this includes Objectives in dungeons.")
       gui.elements.item_types.crafting_items_toggle:render("Crafting Items", "Do you want to pickup Crafting Items?")
       gui.elements.item_types.obducite_toggle:render("Obducite", "Do you want to pickup Obducite?")
+      gui.elements.item_types.veiled_crystal_toggle:render("Veiled Crystal", "Do you want to pickup Veiled Crystal?")
       gui.elements.item_types.boss_items_toggle:render("Boss Items", "Do you want to pickup Boss summon items?")
       gui.elements.item_types.rare_elixir_items_toggle:render("Rare Elixirs",
          "Do you wanna pickup Rare Elixirs? (Momentum, Holy Bolts)")
