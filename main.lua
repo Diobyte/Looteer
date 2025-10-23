@@ -98,6 +98,11 @@ local function is_walkover_loot(obj)
       walkover_flag = true
    end
 
+   -- Veiled Crystal (custom rare resource)
+   if not walkover_flag and id and require("data.custom_items").veiled_crystal[id] then
+      walkover_flag = true
+   end
+
    -- Aether heuristic
    if not walkover_flag and lname:find("aether") then
       walkover_flag = true
