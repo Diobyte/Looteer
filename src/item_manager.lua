@@ -243,10 +243,10 @@ function ItemManager.check_want_item(item, ignore_distance)
    local is_item_cache = ItemManager.check_is_item_cache(item)
 
    if is_event_item then
-      -- If the item is crafting material or cinders, skip inventory and consumable checks
-      if Utils.is_inventory_full() then
+      -- Event items go to consumable inventory; only pick up if consumable inventory is not full
+      if Utils.is_consumable_inventory_full() then
          return false 
-      elseif Utils.is_consumable_inventory_full() then
+      else
          return true 
       end
    elseif is_crafting_item or is_cinders or is_infernal_warp then
@@ -452,13 +452,15 @@ function ItemManager.check_want_item(item, ignore_distance)
          foundOn = 'quarterstaff'
       else
          -- Fallback to general settings for rarity == 5 or unique/uber items
-         if (rarity == 5 and  Settings.get().custom_toggle == false) then
+         if rarity == 5 then
             required_ga_count = settings.ga_count
-         elseif (rarity == 6 and Settings.get().custom_toggle == false) then --and Settings.get().custom_toggle == false
+         elseif rarity == 6 then
             required_ga_count = settings.unique_ga_count
-         elseif(rarity == 8) then
+         elseif rarity == 8 then
             required_ga_count = CustomItems.ubers[id] and settings.uber_unique_ga_count or settings.unique_ga_count
-         else required_ga_count = 4
+         else
+            -- For any other rarity, use the general legendary setting as fallback
+            required_ga_count = settings.ga_count
          end
       end
       if greater_affix_count < required_ga_count then
@@ -486,10 +488,17 @@ end
 
 function ItemManager.calculate_item_score(item)
    local score = 0
-   local item_info = item:get_item_info()
-   local item_id = item_info:get_sno_id()
-   local display_name = item_info:get_display_name()
-   local item_rarity = item_info:get_rarity()
+   local ok_info, item_info = pcall(function() return item:get_item_info() end)
+   if not ok_info or not item_info then return 0 end
+   
+   local ok_id, item_id = pcall(function() return item_info:get_sno_id() end)
+   if not ok_id then return 0 end
+   
+   local ok_display, display_name = pcall(function() return item_info:get_display_name() end)
+   if not ok_display then return 0 end
+   
+   local ok_rarity, item_rarity = pcall(function() return item_info:get_rarity() end)
+   if not ok_rarity then return 0 end
 
    if CustomItems.ubers[item_id] then
       score = score + 1000

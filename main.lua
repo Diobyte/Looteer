@@ -4,6 +4,7 @@ local Renderer = require("src.renderer")
 local GUI = require("gui")
 local Utils = require("utils.utils")
 local explorerlite = require "core.explorerlite"
+local CustomItems = require("data.custom_items")
 
 -- Track the last walk-over loot target so we can stop pathing if it vanishes (e.g., pet pickup)
 local last_walkover_target_id = nil
@@ -94,12 +95,12 @@ local function is_walkover_loot(obj)
    end
 
    -- Obducite (custom rare resource)
-   if not walkover_flag and id and require("data.custom_items").obducite[id] then
+   if not walkover_flag and id and CustomItems.obducite[id] then
       walkover_flag = true
    end
 
    -- Veiled Crystal (custom rare resource)
-   if not walkover_flag and id and require("data.custom_items").veiled_crystal[id] then
+   if not walkover_flag and id and CustomItems.veiled_crystal[id] then
       walkover_flag = true
    end
 

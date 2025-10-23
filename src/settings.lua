@@ -52,7 +52,7 @@ local settings = {
    legendary_focus_ga_count = 0,
    legendary_totem_ga_count = 0,
 
-   --wepeons
+   --weapons
    --1h
    legendary_1h_mace_ga_count = 0,
    legendary_1h_sword_ga_count = 0,
@@ -123,7 +123,7 @@ function Settings.update()
       legendary_focus_ga_count = gui.elements.affix_settings.legendary_focus_slider:get(),
       legendary_totem_ga_count = gui.elements.affix_settings.legendary_totem_slider:get(),
 
-      --Wepeons Settings
+      --Weapons Settings
          --1h
          legendary_1h_mace_ga_count = gui.elements.affix_settings.legendary_1h_mace_slider:get(),
          legendary_1h_sword_ga_count = gui.elements.affix_settings.legendary_1h_sword_slider:get(),
