@@ -43,7 +43,7 @@ local function prune_failed_attempts()
       return
    end
    local active_ids = {}
-   local items = actors_manager:get_all_items()
+   local items = actors_manager.get_all_items()
    for _, it in pairs(items) do
       active_ids[it:get_id()] = true
    end
@@ -139,7 +139,7 @@ end
 -- Check if an object with a specific id still exists among world items
 local function item_exists_by_id(id)
    if not id then return false end
-   local items = actors_manager:get_all_items()
+   local items = actors_manager.get_all_items()
    for _, it in pairs(items) do
       if it:get_id() == id then
          return true

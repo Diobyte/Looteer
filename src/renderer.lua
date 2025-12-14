@@ -33,7 +33,7 @@ function Renderer.draw_stuff()
     local current_time = get_time_since_inject()
     if current_time - last_cache_update > CACHE_INTERVAL then
         wanted_items_cache = {}
-        local items = actors_manager:get_all_items()
+        local items = actors_manager.get_all_items()
         for _, item in pairs(items) do
             -- Check want item with ignore_distance=true AND ignore_inventory=true
             if ItemManager.check_want_item(item, true, true) then

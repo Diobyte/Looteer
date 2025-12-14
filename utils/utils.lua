@@ -54,7 +54,7 @@ function Utils.is_socketable_inventory_full()
 end
 
 function Utils.player_in_zone(zname)
-    return get_current_world():get_current_zone_name() == zname
+    return world.get_current_zone_name() == zname
 end
 
 return Utils

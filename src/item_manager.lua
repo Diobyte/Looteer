@@ -82,7 +82,7 @@ end
 -- Generic function to check item type
 function ItemManager.check_item_type(item, type_name)
    local item_info = item and item:get_item_info()
-   if not item_info then return false end
+   if not item_info or not item_info:is_valid() then return false end
    local ok, name = pcall(function() return item_info:get_skin_name() end)
    if not ok or not name then return false end
    local name_lower = to_lower(name)
@@ -246,7 +246,7 @@ function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
    ---@diagnostic disable-next-line
    local ok_info, item_info = pcall(function() return item:get_item_info() end)
    if not ok_info then return false end
-   if not item_info then return false end
+   if not item_info or not item_info:is_valid() then return false end
    if ItemManager.is_blacklisted(item) then return false end
 
    local settings = Settings.get()
@@ -396,7 +396,7 @@ function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
 end
 
 function ItemManager.get_nearby_item()
-   local items = actors_manager:get_all_items()
+   local items = actors_manager.get_all_items()
    local nearest_item = nil
    local nearest_dist = math.huge
    for _, item in pairs(items) do
@@ -451,7 +451,7 @@ function ItemManager.calculate_item_score(item)
 end
 
 function ItemManager.get_best_item()
-   local items = actors_manager:get_all_items()
+   local items = actors_manager.get_all_items()
    local best_item = nil
    local best_score = -math.huge
    for _, item in ipairs(items) do

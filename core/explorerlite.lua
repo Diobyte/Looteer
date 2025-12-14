@@ -302,7 +302,7 @@ local function get_neighbors(point)
             point:z()
         )
         back_direction = set_height_of_valid_position(back_direction)
-        if utility.is_point_walkeable(back_direction) then
+        if world.is_point_walkable(back_direction) then
             table.insert(neighbors, back_direction)
         end
     end
