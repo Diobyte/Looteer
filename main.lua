@@ -79,19 +79,21 @@ local function is_walkover_loot(obj)
    local walkover_flag = false
    if ItemManager.check_is_cinders(obj) or 
       ItemManager.check_is_infernal_warp(obj) or 
-      ItemManager.check_is_crafting(obj) then
+      ItemManager.check_is_crafting(obj) or
+      ItemManager.check_is_prism(obj) then
+      walkover_flag = true
+   end
+
+   -- Boss Items are now materials (Walkover)
+   if not walkover_flag and id and CustomItems.boss_items[id] then
       walkover_flag = true
    end
 
    local is_rune = ItemManager.check_is_rune(obj)
-   local is_prism = ItemManager.check_is_prism(obj)
-
-   if is_rune or is_prism then
-      if ok_interact and interactable ~= false then
-         walkover_flag = false
-      else
-         walkover_flag = true
-      end
+   
+   if is_rune then
+      -- Runes are click-to-loot items
+      walkover_flag = false
    end
 
    -- Obducite (custom rare resource)

@@ -1,4 +1,3 @@
-
 local ItemLogic = {}
 
 -- Helper function to safely get item info
@@ -80,11 +79,23 @@ function ItemLogic.is_unique_boots(item)
 end
 
 --offhand
+function ItemLogic.is_legendary_shield(item)
+   return safe_check_item(item, 5, "Shield")
+end
+function ItemLogic.is_unique_shield(item)
+   return safe_check_item(item, 6, "Shield")
+end
 function ItemLogic.is_legendary_focus(item)
    return safe_check_item(item, 5, "offHandsSorc")
 end
+function ItemLogic.is_unique_focus(item)
+   return safe_check_item(item, 6, "offHandsSorc")
+end
 function ItemLogic.is_legendary_totem(item)
    return safe_check_item(item, 5, "offHandsDruid")
+end
+function ItemLogic.is_unique_totem(item)
+   return safe_check_item(item, 6, "offHandsDruid")
 end
 
 --1Handed Weapons
@@ -103,6 +114,9 @@ end
 function ItemLogic.is_legendary_wand(item)
    return safe_check_item(item, 5, "wand")
 end
+function ItemLogic.is_legendary_1h_scythe(item)
+   return safe_check_item(item, 5, "scythe")
+end
 function ItemLogic.is_unique_1h_mace(item)
    return safe_check_item(item, 6, "mace")
 end
@@ -117,6 +131,9 @@ function ItemLogic.is_unique_dagger(item)
 end
 function ItemLogic.is_unique_wand(item)
    return safe_check_item(item, 6, "wand")
+end
+function ItemLogic.is_unique_1h_scythe(item)
+   return safe_check_item(item, 6, "scythe")
 end
 
 --2H Weapons
@@ -147,6 +164,9 @@ end
 function ItemLogic.is_legendary_quarterstaff(item)
    return safe_check_item(item, 5, "Quarterstaff")
 end
+function ItemLogic.is_legendary_2h_scythe(item)
+   return safe_check_item(item, 5, "Scythe")
+end
 function ItemLogic.is_unique_2h_mace(item)
    return safe_check_item(item, 6, "Mace")
 end
@@ -173,6 +193,9 @@ function ItemLogic.is_unique_glaive(item)
 end
 function ItemLogic.is_unique_quarterstaff(item)
    return safe_check_item(item, 6, "Quarterstaff")
+end
+function ItemLogic.is_unique_2h_scythe(item)
+   return safe_check_item(item, 6, "Scythe")
 end
 
 

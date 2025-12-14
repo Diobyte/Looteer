@@ -32,7 +32,7 @@ local settings = {
    tribute = false,
    scroll = false,
    event_items = true,
-   --jewerly
+   --jewelry
    legendary_amulet_ga_count = 0,
    legendary_ring_ga_count = 0,
    unique_amulet_ga_count = 0,
@@ -49,8 +49,12 @@ local settings = {
    unique_pants_ga_count = 0,
    unique_boots_ga_count = 0,
    --offhand
+   legendary_shield_ga_count = 0,
+   unique_shield_ga_count = 0,
    legendary_focus_ga_count = 0,
+   unique_focus_ga_count = 0,
    legendary_totem_ga_count = 0,
+   unique_totem_ga_count = 0,
 
    --weapons
    --1h
@@ -59,11 +63,13 @@ local settings = {
    legendary_1h_axe_ga_count = 0,
    legendary_dagger_ga_count = 0,
    legendary_wand_ga_count = 0,
+   legendary_1h_scythe_ga_count = 0,
    unique_1h_mace_ga_count = 0,
    unique_1h_sword_ga_count = 0,
    unique_1h_axe_ga_count = 0,
    unique_dagger_ga_count = 0,
    unique_wand_ga_count = 0,
+   unique_1h_scythe_ga_count = 0,
    --2h
    legendary_2h_mace_ga_count = 0,
    legendary_2h_sword_ga_count = 0,
@@ -74,6 +80,7 @@ local settings = {
    legendary_crossbow_ga_count = 0,
    legendary_glaive_ga_count = 0,
    legendary_quarterstaff_ga_count = 0,
+   legendary_2h_scythe_ga_count = 0,
    unique_2h_mace_ga_count = 0,
    unique_2h_sword_ga_count = 0,
    unique_2h_axe_ga_count = 0,
@@ -83,6 +90,7 @@ local settings = {
    unique_crossbow_ga_count = 0,
    unique_glaive_ga_count = 0,
    unique_quarterstaff_ga_count = 0,
+   unique_2h_scythe_ga_count = 0,
 
    draw_wanted_items = false
 }
@@ -120,8 +128,12 @@ function Settings.update()
       unique_pants_ga_count = gui.elements.affix_settings.unique_pants_slider:get(),
       unique_boots_ga_count = gui.elements.affix_settings.unique_boots_slider:get(),
       --offhand
+      legendary_shield_ga_count = gui.elements.affix_settings.legendary_shield_slider:get(),
+      unique_shield_ga_count = gui.elements.affix_settings.unique_shield_slider:get(),
       legendary_focus_ga_count = gui.elements.affix_settings.legendary_focus_slider:get(),
+      unique_focus_ga_count = gui.elements.affix_settings.unique_focus_slider:get(),
       legendary_totem_ga_count = gui.elements.affix_settings.legendary_totem_slider:get(),
+      unique_totem_ga_count = gui.elements.affix_settings.unique_totem_slider:get(),
 
       --Weapons Settings
          --1h
@@ -130,11 +142,13 @@ function Settings.update()
          legendary_1h_axe_ga_count = gui.elements.affix_settings.legendary_1h_axe_slider:get(),
          legendary_dagger_ga_count = gui.elements.affix_settings.legendary_dagger_slider:get(),
          legendary_wand_ga_count = gui.elements.affix_settings.legendary_wand_slider:get(),
+         legendary_1h_scythe_ga_count = gui.elements.affix_settings.legendary_1h_scythe_slider:get(),
          unique_1h_mace_ga_count = gui.elements.affix_settings.unique_1h_mace_slider:get(),
          unique_1h_sword_ga_count = gui.elements.affix_settings.unique_1h_sword_slider:get(),
          unique_1h_axe_ga_count = gui.elements.affix_settings.unique_1h_axe_slider:get(),
          unique_dagger_ga_count = gui.elements.affix_settings.unique_dagger_slider:get(),
          unique_wand_ga_count = gui.elements.affix_settings.unique_wand_slider:get(),
+         unique_1h_scythe_ga_count = gui.elements.affix_settings.unique_1h_scythe_slider:get(),
          --2h
          legendary_2h_mace_ga_count = gui.elements.affix_settings.legendary_2h_mace_slider:get(),
          legendary_2h_sword_ga_count = gui.elements.affix_settings.legendary_2h_sword_slider:get(),
@@ -145,6 +159,7 @@ function Settings.update()
          legendary_crossbow_ga_count = gui.elements.affix_settings.legendary_crossbow_slider:get(),
          legendary_glaive_ga_count = gui.elements.affix_settings.legendary_glaive_slider:get(),
          legendary_quarterstaff_ga_count = gui.elements.affix_settings.legendary_quarterstaff_slider:get(),
+         legendary_2h_scythe_ga_count = gui.elements.affix_settings.legendary_2h_scythe_slider:get(),
          unique_2h_mace_ga_count = gui.elements.affix_settings.unique_2h_mace_slider:get(),
          unique_2h_sword_ga_count = gui.elements.affix_settings.unique_2h_sword_slider:get(),
          unique_2h_axe_ga_count = gui.elements.affix_settings.unique_2h_axe_slider:get(),
@@ -154,6 +169,7 @@ function Settings.update()
          unique_crossbow_ga_count = gui.elements.affix_settings.unique_crossbow_slider:get(),
          unique_glaive_ga_count = gui.elements.affix_settings.unique_glaive_slider:get(),
          unique_quarterstaff_ga_count = gui.elements.affix_settings.unique_quarterstaff_slider:get(),
+         unique_2h_scythe_ga_count = gui.elements.affix_settings.unique_2h_scythe_slider:get(),
 
       
       -- Item Types

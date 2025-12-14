@@ -14,7 +14,10 @@ local item_type_patterns = {
    sigil = { "nightmare_sigil", "s07_witchersigil", "s07_drlg_sigil" },
    compass = { "bsk_sigil" },
    tribute = { "undercity_tribute" },
-   equipment = { "base", "amulet", "ring" },
+   equipment = { 
+      "base", "amulet", "ring", "axe", "sword", "mace", "dagger", "wand", "staff", "bow", "crossbow", 
+      "shield", "focus", "totem", "helm", "chest", "gloves", "pants", "boots", "glaive", "quarterstaff", "scythe"
+   },
    item_cache = { "item_cache" },
    quest = { "global", "glyph", "qst", "dgn", "pvp_currency", "s07_witch_bonus", "gamblingcurrency_key", "experience_powerup_actor", "s09_arcana" },
    crafting = { "craftingmaterial", "crafting_legendary" },
@@ -85,9 +88,9 @@ function ItemManager.check_item_type(item, type_name)
    local name_lower = to_lower(name)
 
    -- Special case for equipment
-   if type_name == "equipment" and item_info:get_rarity() ~= 0 then
-      return false
-   end
+   -- if type_name == "equipment" and item_info:get_rarity() ~= 0 then
+   --    return false
+   -- end
 
    for _, pattern in ipairs(item_type_patterns[type_name] or {}) do
       local pattern_type = type(pattern)
@@ -181,9 +184,65 @@ function ItemManager.check_is_opal(item)
    return ItemManager.check_item_type(item, "opal")
 end
 
+local ga_settings_map = {
+   { check = ItemLogic.is_legendary_amulet, setting = "legendary_amulet_ga_count" },
+   { check = ItemLogic.is_legendary_ring, setting = "legendary_ring_ga_count" },
+   { check = ItemLogic.is_unique_amulet, setting = "unique_amulet_ga_count" },
+   { check = ItemLogic.is_unique_ring, setting = "unique_ring_ga_count" },
+   { check = ItemLogic.is_legendary_helm, setting = "legendary_helm_ga_count" },
+   { check = ItemLogic.is_unique_helm, setting = "unique_helm_ga_count" },
+   { check = ItemLogic.is_legendary_chest, setting = "legendary_chest_ga_count" },
+   { check = ItemLogic.is_unique_chest, setting = "unique_chest_ga_count" },
+   { check = ItemLogic.is_legendary_gloves, setting = "legendary_gloves_ga_count" },
+   { check = ItemLogic.is_unique_gloves, setting = "unique_gloves_ga_count" },
+   { check = ItemLogic.is_legendary_pants, setting = "legendary_pants_ga_count" },
+   { check = ItemLogic.is_unique_pants, setting = "unique_pants_ga_count" },
+   { check = ItemLogic.is_legendary_boots, setting = "legendary_boots_ga_count" },
+   { check = ItemLogic.is_unique_boots, setting = "unique_boots_ga_count" },
+   { check = ItemLogic.is_legendary_shield, setting = "legendary_shield_ga_count" },
+   { check = ItemLogic.is_unique_shield, setting = "unique_shield_ga_count" },
+   { check = ItemLogic.is_legendary_focus, setting = "legendary_focus_ga_count" },
+   { check = ItemLogic.is_unique_focus, setting = "unique_focus_ga_count" },
+   { check = ItemLogic.is_legendary_totem, setting = "legendary_totem_ga_count" },
+   { check = ItemLogic.is_unique_totem, setting = "unique_totem_ga_count" },
+   { check = ItemLogic.is_legendary_1h_mace, setting = "legendary_1h_mace_ga_count" },
+   { check = ItemLogic.is_legendary_1h_axe, setting = "legendary_1h_axe_ga_count" },
+   { check = ItemLogic.is_legendary_1h_sword, setting = "legendary_1h_sword_ga_count" },
+   { check = ItemLogic.is_legendary_dagger, setting = "legendary_dagger_ga_count" },
+   { check = ItemLogic.is_legendary_wand, setting = "legendary_wand_ga_count" },
+   { check = ItemLogic.is_legendary_1h_scythe, setting = "legendary_1h_scythe_ga_count" },
+   { check = ItemLogic.is_unique_1h_mace, setting = "unique_1h_mace_ga_count" },
+   { check = ItemLogic.is_unique_1h_axe, setting = "unique_1h_axe_ga_count" },
+   { check = ItemLogic.is_unique_1h_sword, setting = "unique_1h_sword_ga_count" },
+   { check = ItemLogic.is_unique_dagger, setting = "unique_dagger_ga_count" },
+   { check = ItemLogic.is_unique_wand, setting = "unique_wand_ga_count" },
+   { check = ItemLogic.is_unique_1h_scythe, setting = "unique_1h_scythe_ga_count" },
+   { check = ItemLogic.is_legendary_2h_axe, setting = "legendary_2h_axe_ga_count" },
+   { check = ItemLogic.is_legendary_2h_mace, setting = "legendary_2h_mace_ga_count" },
+   { check = ItemLogic.is_legendary_2h_sword, setting = "legendary_2h_sword_ga_count" },
+   { check = ItemLogic.is_legendary_2h_polearm, setting = "legendary_2h_polearm_ga_count" },
+   { check = ItemLogic.is_legendary_staff, setting = "legendary_staff_ga_count" },
+   { check = ItemLogic.is_legendary_bow, setting = "legendary_bow_ga_count" },
+   { check = ItemLogic.is_legendary_crossbow, setting = "legendary_crossbow_ga_count" },
+   { check = ItemLogic.is_legendary_glaive, setting = "legendary_glaive_ga_count" },
+   { check = ItemLogic.is_legendary_quarterstaff, setting = "legendary_quarterstaff_ga_count" },
+   { check = ItemLogic.is_legendary_2h_scythe, setting = "legendary_2h_scythe_ga_count" },
+   { check = ItemLogic.is_unique_2h_axe, setting = "unique_2h_axe_ga_count" },
+   { check = ItemLogic.is_unique_2h_mace, setting = "unique_2h_mace_ga_count" },
+   { check = ItemLogic.is_unique_2h_sword, setting = "unique_2h_sword_ga_count" },
+   { check = ItemLogic.is_unique_2h_polearm, setting = "unique_2h_polearm_ga_count" },
+   { check = ItemLogic.is_unique_staff, setting = "unique_staff_ga_count" },
+   { check = ItemLogic.is_unique_bow, setting = "unique_bow_ga_count" },
+   { check = ItemLogic.is_unique_crossbow, setting = "unique_crossbow_ga_count" },
+   { check = ItemLogic.is_unique_glaive, setting = "unique_glaive_ga_count" },
+   { check = ItemLogic.is_unique_quarterstaff, setting = "unique_quarterstaff_ga_count" },
+   { check = ItemLogic.is_unique_2h_scythe, setting = "unique_2h_scythe_ga_count" },
+}
+
 ---@param item game.object Item to check
 ---@param ignore_distance boolean If we want to ignore the distance check
-function ItemManager.check_want_item(item, ignore_distance)
+---@param ignore_inventory boolean If we want to ignore the inventory check (e.g. for drawing)
+function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
    ---@diagnostic disable-next-line
    local ok_info, item_info = pcall(function() return item:get_item_info() end)
    if not ok_info then return false end
@@ -296,7 +355,7 @@ function ItemManager.check_want_item(item, ignore_distance)
 
    -- Handle Equipments
    local inventory_full = Utils.is_inventory_full()
-   if inventory_full then return false end
+   if not ignore_inventory and inventory_full then return false end
 
    -- Check rarity
    if rarity < settings.rarity then return false end
@@ -305,152 +364,17 @@ function ItemManager.check_want_item(item, ignore_distance)
    if rarity >= 5 then
       local greater_affix_count = Utils.get_greater_affix_count(item_info:get_display_name())
       local required_ga_count
-      local foundOn = ''
 
+      if Settings.get().custom_toggle then
+         for _, map in ipairs(ga_settings_map) do
+            if map.check(item) then
+               required_ga_count = settings[map.setting]
+               break
+            end
+         end
+      end
 
-      -- Check each item type explicitly and set the required GA count accordingly
-      --jewerly
-      if ItemLogic.is_legendary_amulet(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_amulet_ga_count
-         foundOn = 'amulet'
-      elseif ItemLogic.is_legendary_ring(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_ring_ga_count
-         foundOn = 'ring'
-      elseif ItemLogic.is_unique_amulet(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_amulet_ga_count
-         foundOn = 'uniqueAmulet'
-      elseif ItemLogic.is_unique_ring(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_ring_ga_count
-         foundOn = 'uniqueRing'
-
-      --Armors
-      elseif ItemLogic.is_legendary_helm(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_helm_ga_count
-         foundOn = 'helm'
-      elseif ItemLogic.is_unique_helm(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_helm_ga_count
-         foundOn = 'uniqueHelm'
-      elseif ItemLogic.is_legendary_chest(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_chest_ga_count
-         foundOn = 'chest'
-      elseif ItemLogic.is_unique_chest(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_chest_ga_count
-         foundOn = 'uniqueChest'
-      elseif ItemLogic.is_legendary_gloves(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_gloves_ga_count
-         foundOn = 'gloves'
-      elseif ItemLogic.is_unique_gloves(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_gloves_ga_count
-         foundOn = 'uniqueGloves'
-      elseif ItemLogic.is_legendary_pants(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_pants_ga_count
-         foundOn = 'pants'
-      elseif ItemLogic.is_unique_pants(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_pants_ga_count
-         foundOn = 'uniquePants'
-      elseif ItemLogic.is_legendary_boots(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_boots_ga_count
-         foundOn = 'boots'
-      elseif ItemLogic.is_unique_boots(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_boots_ga_count
-         foundOn = 'uniqueBoots'
-      
-      --offhand
-      elseif ItemLogic.is_legendary_focus(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_focus_ga_count
-         foundOn = 'focus'
-      elseif ItemLogic.is_legendary_totem(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_totem_ga_count
-         foundOn = 'totem'
-
-      --Wepeons
-      elseif ItemLogic.is_legendary_1h_mace(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_1h_mace_ga_count
-         foundOn = '1hMace'
-      elseif ItemLogic.is_legendary_1h_axe(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_1h_axe_ga_count
-         foundOn = '1hAxe'
-      elseif ItemLogic.is_legendary_1h_sword(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_1h_sword_ga_count
-         foundOn = '1hSword'
-      elseif ItemLogic.is_legendary_dagger(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_dagger_ga_count
-         foundOn = 'dagger'
-      elseif ItemLogic.is_legendary_wand(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_wand_ga_count
-         foundOn = 'wand'
-      elseif ItemLogic.is_unique_1h_mace(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_1h_mace_ga_count
-         foundOn = 'unique1hMace'
-      elseif ItemLogic.is_unique_1h_axe(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_1h_axe_ga_count
-         foundOn = 'unique1hAxe'
-      elseif ItemLogic.is_unique_1h_sword(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_1h_sword_ga_count
-         foundOn = 'unique1hSword'
-      elseif ItemLogic.is_unique_dagger(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_dagger_ga_count
-         foundOn = 'uniqueDagger'
-      elseif ItemLogic.is_unique_wand(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_wand_ga_count
-         foundOn = 'uniqueWand'
-
-         --2h
-      elseif ItemLogic.is_legendary_2h_axe(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_2h_axe_ga_count
-         foundOn = '2hAxe'
-      elseif ItemLogic.is_legendary_2h_mace(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_2h_mace_ga_count
-         foundOn = '2hMace'
-      elseif ItemLogic.is_legendary_2h_sword(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_2h_sword_ga_count
-         foundOn = '2hSword'
-      elseif ItemLogic.is_legendary_2h_polearm(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_2h_polearm_ga_count
-         foundOn = '2hPolearm'
-      elseif ItemLogic.is_legendary_staff(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_staff_ga_count
-         foundOn = 'staff'
-      elseif ItemLogic.is_legendary_bow(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_bow_ga_count
-         foundOn = 'bow'
-      elseif ItemLogic.is_legendary_crossbow(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_crossbow_ga_count
-         foundOn = 'crossbow'
-      elseif ItemLogic.is_legendary_glaive(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_glaive_ga_count
-         foundOn = 'glaive'
-      elseif ItemLogic.is_legendary_quarterstaff(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.legendary_quarterstaff_ga_count
-         foundOn = 'quarterstaff'
-      elseif ItemLogic.is_unique_2h_axe(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_2h_axe_ga_count
-         foundOn = '2hAxe'
-      elseif ItemLogic.is_unique_2h_mace(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_2h_mace_ga_count
-         foundOn = '2hMace'
-      elseif ItemLogic.is_unique_2h_sword(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_2h_sword_ga_count
-         foundOn = '2hSword'
-      elseif ItemLogic.is_unique_2h_polearm(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_2h_polearm_ga_count
-         foundOn = '2hPolearm'
-      elseif ItemLogic.is_unique_staff(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_staff_ga_count
-         foundOn = 'staff'
-      elseif ItemLogic.is_unique_bow(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_bow_ga_count
-         foundOn = 'bow'
-      elseif ItemLogic.is_unique_crossbow(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_crossbow_ga_count
-         foundOn = 'crossbow'
-      elseif ItemLogic.is_unique_glaive(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_glaive_ga_count
-         foundOn = 'glaive'
-      elseif ItemLogic.is_unique_quarterstaff(item) and Settings.get().custom_toggle == true then
-         required_ga_count = settings.unique_quarterstaff_ga_count
-         foundOn = 'quarterstaff'
-      else
+      if not required_ga_count then
          -- Fallback to general settings for rarity == 5 or unique/uber items
          if rarity == 5 then
             required_ga_count = settings.ga_count
@@ -463,6 +387,7 @@ function ItemManager.check_want_item(item, ignore_distance)
             required_ga_count = settings.ga_count
          end
       end
+      
       if greater_affix_count < required_ga_count then
          return false
       end

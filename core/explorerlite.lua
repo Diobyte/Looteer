@@ -534,20 +534,11 @@ end
 function explorerlite:move_to_target()
     --console.print("Moving to target")
     if handle_stuck_player() then
-        -- If we've just set a temporary target, we want to move to it immediately
-        if settings.aggresive_movement then
-            move_to_target_aggresive()
-        else
-            move_to_target()
-        end
+        move_to_target()
         return
     end
 
-    if settings.aggresive_movement then
-        move_to_target_aggresive()
-    else
-        move_to_target()
-    end
+    move_to_target()
 end
 
 

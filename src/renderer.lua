@@ -4,6 +4,10 @@ local Utils = require("utils.utils")
 
 local Renderer = {}
 
+local wanted_items_cache = {}
+local last_cache_update = 0
+local CACHE_INTERVAL = 0.2
+
 function Renderer.draw_stuff()
     local player = get_local_player()
     if not player then return end
@@ -26,10 +30,23 @@ function Renderer.draw_stuff()
 
     if not settings.draw_wanted_items then return end
 
-    local items = actors_manager:get_all_items()
-    for _, item in pairs(items) do
-        if ItemManager.check_want_item(item, true) then
-            graphics.circle_3d(item:get_position(), 0.5, color_pink(255), 3)
+    local current_time = get_time_since_inject()
+    if current_time - last_cache_update > CACHE_INTERVAL then
+        wanted_items_cache = {}
+        local items = actors_manager:get_all_items()
+        for _, item in pairs(items) do
+            -- Check want item with ignore_distance=true AND ignore_inventory=true
+            if ItemManager.check_want_item(item, true, true) then
+                table.insert(wanted_items_cache, item)
+            end
+        end
+        last_cache_update = current_time
+    end
+
+    for _, item in ipairs(wanted_items_cache) do
+        local ok, pos = pcall(function() return item:get_position() end)
+        if ok and pos then
+            graphics.circle_3d(pos, 0.5, color_pink(255), 3)
         end
     end
 end
