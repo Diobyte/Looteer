@@ -89,6 +89,15 @@ local custom_items = {
         [1982241] = "Nesekem, the Herald",
         [2059799] = "Heir of Perdition",
         [2059813] = "Shattered Vow"
+    },
+    -- Season 11: Corrupted Essences (turn in to Hadriel for Divine Gifts)
+    s11_corrupted_essence = {
+        [3891986871] = "Andariel Corrupted Essence",
+        [1342557472] = "Azmodan Corrupted Essence",
+        [3130595879] = "Azmodan Corrupted Essence",
+        [3729520490] = "Belial Corrupted Essence",
+        [3729520516] = "Belial Corrupted Essence",
+        [432311198] = "Duriel Corrupted Essence",
     }
 }
 
