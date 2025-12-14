@@ -184,6 +184,73 @@ function ItemManager.check_is_opal(item)
    return ItemManager.check_item_type(item, "opal")
 end
 
+function ItemManager.is_walkover_item(item)
+   if not item then return false end
+   
+   if ItemManager.check_is_equipment(item) or ItemManager.check_is_item_cache(item) then return false end
+
+   local ok_info, item_info = pcall(function() return item:get_item_info() end)
+   local id = nil
+   if ok_info and item_info and item_info:is_valid() then
+      local ok_id, sno = pcall(function() return item_info:get_sno_id() end)
+      if ok_id then id = sno end
+   end
+
+   local walkover_flag = false
+
+   if ItemManager.check_is_cinders(item) or 
+      ItemManager.check_is_infernal_warp(item) or 
+      ItemManager.check_is_crafting(item) or
+      ItemManager.check_is_prism(item) then
+      walkover_flag = true
+   end
+
+   if not walkover_flag and id and CustomItems.boss_items[id] then
+      walkover_flag = true
+   end
+
+   if ItemManager.check_is_rune(item) then
+      walkover_flag = false
+   end
+
+   if not walkover_flag and id and CustomItems.obducite[id] then
+      walkover_flag = true
+   end
+
+   if not walkover_flag and id and CustomItems.veiled_crystal[id] then
+      walkover_flag = true
+   end
+
+   local ok_name, name_raw = pcall(function() return item:get_skin_name() end)
+   local lname = (ok_name and name_raw and name_raw:lower()) or ""
+   
+   if not walkover_flag and lname:find("aether") then
+      walkover_flag = true
+   end
+
+   if walkover_flag then
+      if ItemManager.check_is_sigil(item) or
+         ItemManager.check_is_compass(item) or
+         ItemManager.check_is_tribute(item) or
+         ItemManager.check_is_scroll(item) or
+         ItemManager.check_is_recipe(item) or
+         ItemManager.check_is_quest_item(item) then
+         walkover_flag = false
+      end
+   end
+
+   if not walkover_flag then
+      local ok_interact, interactable = pcall(function() return item:is_interactable() end)
+      if ok_interact and interactable == false then
+         if not (ItemManager.check_is_sigil(item) or ItemManager.check_is_compass(item) or ItemManager.check_is_tribute(item)) then
+            walkover_flag = true
+         end
+      end
+   end
+
+   return walkover_flag
+end
+
 local ga_settings_map = {
    { check = ItemLogic.is_legendary_amulet, setting = "legendary_amulet_ga_count" },
    { check = ItemLogic.is_legendary_ring, setting = "legendary_ring_ga_count" },
@@ -239,43 +306,14 @@ local ga_settings_map = {
    { check = ItemLogic.is_unique_2h_scythe, setting = "unique_2h_scythe_ga_count" },
 }
 
----@param item game.object Item to check
----@param ignore_distance boolean If we want to ignore the distance check
----@param ignore_inventory boolean If we want to ignore the inventory check (e.g. for drawing)
-function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
-   ---@diagnostic disable-next-line
-   local ok_info, item_info = pcall(function() return item:get_item_info() end)
-   if not ok_info then return false end
-   if not item_info or not item_info:is_valid() then return false end
-   if ItemManager.is_blacklisted(item) then return false end
-
-   local settings = Settings.get()
-   local id = item_info:get_sno_id()
-   local rarity = item_info:get_rarity()
-   local affixes = item_info:get_affixes()
-
-   -- Early return checks
-   if not ignore_distance and Utils.distance_to(item) >= settings.distance then return false end
-   if settings.skip_dropped and #affixes > 0 then
-      local ok_row, row = pcall(function() return item_info:get_inventory_row() end)
-      local ok_col, col = pcall(function() return item_info:get_inventory_column() end)
-      if ok_row and ok_col and row and col and row >= 0 and col >= 0 then
-         return false
-      end
-   end
-   if loot_manager.is_gold(item) or loot_manager.is_potion(item) then return false end
-   
+local function check_special_items(item, id, item_info, settings)
    -- Check for Obducite BEFORE general crafting check to prevent interference
-   local is_obducite = CustomItems.obducite[id]
-   if is_obducite then
-      -- Only pick up if obducite toggle is enabled
+   if CustomItems.obducite[id] then
       return settings.obducite
    end
    
    -- Check for Veiled Crystal BEFORE general crafting check to prevent interference
-   local is_veiled_crystal = CustomItems.veiled_crystal[id]
-   if is_veiled_crystal then
-      -- Only pick up if veiled_crystal toggle is enabled
+   if CustomItems.veiled_crystal[id] then
       return settings.veiled_crystal
    end
    
@@ -302,55 +340,67 @@ function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
    local is_item_cache = ItemManager.check_is_item_cache(item)
 
    if is_event_item then
-      -- Event items go to consumable inventory; only pick up if consumable inventory is not full
-      if Utils.is_consumable_inventory_full() then
-         return false 
-      else
-         return true 
-      end
+      return not Utils.is_consumable_inventory_full()
    elseif is_crafting_item or is_cinders or is_infernal_warp then
-      -- If the item is crafting material or cinders, skip inventory and consumable checks
       return true
    elseif is_sigils then
-      -- Sigil has its own inventory now, only pick it if sigil inventory is not full
-      if not Utils.is_sigil_inventory_full() then
-         return true
-      end
+      return not Utils.is_sigil_inventory_full()
    elseif is_consumable_item then
-      -- Consumable inventory check and if have existing stack to loot
-      if not Utils.is_consumable_inventory_full() or
+      return not Utils.is_consumable_inventory_full() or
             Utils.is_lowest_stack_below(
                get_local_player():get_consumable_items(),
                id,
                ItemManager.check_item_stack(item, id),
                item_info:get_stack_count()
-            ) then
-         return true
-      end
+            )
    elseif is_rune or is_prism then
-      -- Socketable inventory check and if have existing stack to loot
-      if not Utils.is_socketable_inventory_full() or
+      return not Utils.is_socketable_inventory_full() or
             Utils.is_lowest_stack_below(
                get_local_player():get_socketable_items(),
                id,
                ItemManager.check_item_stack(item, id),
                item_info:get_stack_count()
-            ) then
-         return true
-      else
+            )
+   elseif is_recipe then
+      return not Utils.is_inventory_full()
+   elseif is_item_cache then
+      return not Utils.is_inventory_full()
+   elseif is_quest_item then
+      return true
+   end
+   
+   return nil -- Not a special item
+end
+
+---@param item game.object Item to check
+---@param ignore_distance boolean If we want to ignore the distance check
+---@param ignore_inventory boolean If we want to ignore the inventory check (e.g. for drawing)
+function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
+   ---@diagnostic disable-next-line
+   local ok_info, item_info = pcall(function() return item:get_item_info() end)
+   if not ok_info then return false end
+   if not item_info or not item_info:is_valid() then return false end
+   if ItemManager.is_blacklisted(item) then return false end
+
+   local settings = Settings.get()
+   local id = item_info:get_sno_id()
+   local rarity = item_info:get_rarity()
+   local affixes = item_info:get_affixes()
+
+   -- Early return checks
+   if not ignore_distance and Utils.distance_to(item) >= settings.distance then return false end
+   if settings.skip_dropped and #affixes > 0 then
+      local ok_row, row = pcall(function() return item_info:get_inventory_row() end)
+      local ok_col, col = pcall(function() return item_info:get_inventory_column() end)
+      if ok_row and ok_col and row and col and row >= 0 and col >= 0 then
          return false
       end
-   elseif is_recipe then
-      if not Utils.is_inventory_full() then
-         return true
-      end
-   elseif is_item_cache then
-      if not Utils.is_inventory_full() then
-         return true
-      end
-   elseif is_quest_item then
-      -- Loot them all quest items
-      return true
+   end
+   if loot_manager.is_gold(item) or loot_manager.is_potion(item) then return false end
+   
+   local special_result = check_special_items(item, id, item_info, settings)
+   if special_result ~= nil then
+      return special_result
    end
 
    -- Handle Equipments

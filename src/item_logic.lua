@@ -10,7 +10,7 @@ local ItemRarity = {
 }
 
 -- Helper function to safely get item info
-local function safe_check_item(item, rarity, pattern)
+local function safe_check_item(item, rarity, patterns)
    if not item then return false end
    local ok_info, item_info = pcall(function() return item:get_item_info() end)
    if not ok_info or not item_info then return false end
@@ -18,7 +18,17 @@ local function safe_check_item(item, rarity, pattern)
    if not ok_rarity or item_rarity ~= rarity then return false end
    local ok_name, skin_name = pcall(function() return item_info:get_skin_name() end)
    if not ok_name or not skin_name then return false end
-   return skin_name:find(pattern) ~= nil
+   
+   if type(patterns) == "string" then
+      return skin_name:find(patterns) ~= nil
+   elseif type(patterns) == "table" then
+      for _, pattern in ipairs(patterns) do
+         if skin_name:find(pattern) then
+            return true
+         end
+      end
+   end
+   return false
 end
 
 --Jewelry
@@ -26,14 +36,7 @@ function ItemLogic.is_legendary_amulet(item)
    return safe_check_item(item, ItemRarity.Legendary, "Amulet")
 end
 function ItemLogic.is_unique_amulet(item)
-   if not item then return false end
-   local ok_info, item_info = pcall(function() return item:get_item_info() end)
-   if not ok_info or not item_info then return false end
-   local ok_rarity, item_rarity = pcall(function() return item_info:get_rarity() end)
-   if not ok_rarity or item_rarity ~= ItemRarity.Unique then return false end
-   local ok_name, skin_name = pcall(function() return item_info:get_skin_name() end)
-   if not ok_name or not skin_name then return false end
-   return skin_name:find("Amulet") or skin_name:find("Necklace")
+   return safe_check_item(item, ItemRarity.Unique, {"Amulet", "Necklace"})
 end
 function ItemLogic.is_unique_ring(item)
    return safe_check_item(item, ItemRarity.Unique, "Ring")
@@ -58,27 +61,13 @@ function ItemLogic.is_legendary_gloves(item)
    return safe_check_item(item, ItemRarity.Legendary, "GLV")
 end
 function ItemLogic.is_unique_gloves(item)
-   if not item then return false end
-   local ok_info, item_info = pcall(function() return item:get_item_info() end)
-   if not ok_info or not item_info then return false end
-   local ok_rarity, item_rarity = pcall(function() return item_info:get_rarity() end)
-   if not ok_rarity or item_rarity ~= ItemRarity.Unique then return false end
-   local ok_name, skin_name = pcall(function() return item_info:get_skin_name() end)
-   if not ok_name or not skin_name then return false end
-   return skin_name:find("GLV") or skin_name:find("Gloves")
+   return safe_check_item(item, ItemRarity.Unique, {"GLV", "Gloves"})
 end
 function ItemLogic.is_legendary_pants(item)
    return safe_check_item(item, ItemRarity.Legendary, "LEG")
 end
 function ItemLogic.is_unique_pants(item)
-   if not item then return false end
-   local ok_info, item_info = pcall(function() return item:get_item_info() end)
-   if not ok_info or not item_info then return false end
-   local ok_rarity, item_rarity = pcall(function() return item_info:get_rarity() end)
-   if not ok_rarity or item_rarity ~= ItemRarity.Unique then return false end
-   local ok_name, skin_name = pcall(function() return item_info:get_skin_name() end)
-   if not ok_name or not skin_name then return false end
-   return skin_name:find("LEG") or skin_name:find("Pants")
+   return safe_check_item(item, ItemRarity.Unique, {"LEG", "Pants"})
 end
 function ItemLogic.is_legendary_boots(item)
    return safe_check_item(item, ItemRarity.Legendary, "BTS")
