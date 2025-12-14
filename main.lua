@@ -8,9 +8,14 @@ local CustomItems = require("data.custom_items")
 
 -- Track the last walk-over loot target so we can stop pathing if it vanishes (e.g., pet pickup)
 local last_walkover_target_id = nil
+local last_walkover_time = 0
+local WALKOVER_TIMEOUT = 3.0 -- Seconds to give up on a walkover item if we haven't picked it up
+
 local FAILED_ATTEMPT_WINDOW = 2.5
 local FAILED_ATTEMPT_LIMIT = 4
 local failed_loot_attempts = {}
+local last_prune_time = 0
+local PRUNE_INTERVAL = 5.0 -- Prune every 5 seconds
 
 local function clear_failed_attempt(id)
    if id then
@@ -28,7 +33,7 @@ local function register_failed_attempt(id)
       entry.count = entry.count + 1
       entry.last_time = now
       if entry.count >= FAILED_ATTEMPT_LIMIT then
-         ItemManager.blacklist_item(id, 8.0)
+         ItemManager.blacklist_item(id, 10.0) -- Increased blacklist time
          failed_loot_attempts[id] = nil
          return true
       end
@@ -39,6 +44,10 @@ local function register_failed_attempt(id)
 end
 
 local function prune_failed_attempts()
+   local now = get_time_since_inject()
+   if now - last_prune_time < PRUNE_INTERVAL then return end
+   last_prune_time = now
+
    if not next(failed_loot_attempts) then
       return
    end
@@ -75,10 +84,26 @@ local function handle_loot(wanted_item)
    if not wanted_item then return end
 
    -- If we were previously moving to a walk-over item and it's now gone (e.g., pet picked it up), clear target
-   if last_walkover_target_id and not item_exists_by_id(last_walkover_target_id) then
-      explorerlite:clear_path_and_target()
-      clear_failed_attempt(last_walkover_target_id)
-      last_walkover_target_id = nil
+   if last_walkover_target_id then
+      if not item_exists_by_id(last_walkover_target_id) then
+         explorerlite:clear_path_and_target()
+         clear_failed_attempt(last_walkover_target_id)
+         last_walkover_target_id = nil
+         last_walkover_time = 0
+      elseif wanted_item:get_id() == last_walkover_target_id then
+         -- Check for timeout
+         if get_time_since_inject() - last_walkover_time > WALKOVER_TIMEOUT then
+             ItemManager.blacklist_item(last_walkover_target_id, 5.0)
+             explorerlite:clear_path_and_target()
+             last_walkover_target_id = nil
+             last_walkover_time = 0
+             return -- Stop trying this item
+         end
+      else
+         -- Switched target
+         last_walkover_target_id = nil
+         last_walkover_time = 0
+      end
    end
 
    local walkover = is_walkover_loot(wanted_item)
@@ -86,14 +111,17 @@ local function handle_loot(wanted_item)
    local item_position = wanted_item:get_position()
 
    -- Use a smaller stop distance for walk-over currencies; larger for interactables
-   local stop_dist = walkover and 0.9 or 2.0
+   local stop_dist = walkover and 0.5 or 2.0
 
    if distance > stop_dist then
       explorerlite:set_custom_target(item_position)
       explorerlite:move_to_target()
       -- Remember walk-over target id so we can cancel if it disappears
       if walkover then
-         last_walkover_target_id = wanted_item:get_id()
+         if last_walkover_target_id ~= wanted_item:get_id() then
+             last_walkover_target_id = wanted_item:get_id()
+             last_walkover_time = get_time_since_inject()
+         end
       else
          last_walkover_target_id = nil
          clear_failed_attempt(wanted_item:get_id())
@@ -106,7 +134,10 @@ local function handle_loot(wanted_item)
       -- Do not click; continue walking directly over the item until it disappears (pickup or pet pickup)
       explorerlite:set_custom_target(item_position)
       explorerlite:move_to_target()
-      last_walkover_target_id = wanted_item:get_id()
+      if last_walkover_target_id ~= wanted_item:get_id() then
+          last_walkover_target_id = wanted_item:get_id()
+          last_walkover_time = get_time_since_inject()
+      end
       return
    end
 
@@ -137,6 +168,7 @@ local function main_pulse()
    if last_walkover_target_id and not item_exists_by_id(last_walkover_target_id) then
       explorerlite:clear_path_and_target()
       last_walkover_target_id = nil
+      last_walkover_time = 0
    end
 
    local loot_priority = GUI.elements.general.loot_priority_combo:get()
@@ -152,6 +184,7 @@ local function main_pulse()
          if last_walkover_target_id then
             explorerlite:clear_path_and_target()
             last_walkover_target_id = nil
+            last_walkover_time = 0
          end
       end
    elseif loot_priority == 1 then
@@ -165,6 +198,7 @@ local function main_pulse()
          if last_walkover_target_id then
             explorerlite:clear_path_and_target()
             last_walkover_target_id = nil
+            last_walkover_time = 0
          end
       end
    end
