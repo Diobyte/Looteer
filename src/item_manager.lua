@@ -358,7 +358,40 @@ function ItemManager.check_want_item(item, ignore_distance, ignore_inventory)
    if not ignore_inventory and inventory_full then return false end
 
    -- Check rarity
-   if rarity < settings.rarity then return false end
+   -- Mapping UI index to Logic
+   -- 0: Common (0)
+   -- 1: Magic (1)
+   -- 2: Rare (3)
+   -- 3: Legendary (5)
+   -- 4: Unique (6)
+   -- 5: Ancestral Legendary (5 + Ancestral)
+   -- 6: Ancestral Unique (6 + Ancestral)
+   
+   local min_rarity_id = 0
+   local require_ancestral = false
+
+   if settings.rarity == 0 then min_rarity_id = 0
+   elseif settings.rarity == 1 then min_rarity_id = 1
+   elseif settings.rarity == 2 then min_rarity_id = 3
+   elseif settings.rarity == 3 then min_rarity_id = 5
+   elseif settings.rarity == 4 then min_rarity_id = 6
+   elseif settings.rarity == 5 then 
+      min_rarity_id = 5
+      require_ancestral = true
+   elseif settings.rarity == 6 then 
+      min_rarity_id = 6
+      require_ancestral = true
+   end
+
+   if rarity < min_rarity_id then return false end
+   
+   if require_ancestral then
+       local is_ancestral = false
+       local ok_anc, anc = pcall(function() return item_info:is_ancestral() end)
+       if ok_anc and anc then is_ancestral = true end
+       
+       if not is_ancestral then return false end
+   end
 
    -- Check greater affixes for high rarity items
    if rarity >= 5 then
