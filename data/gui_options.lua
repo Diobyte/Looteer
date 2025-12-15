@@ -4,13 +4,18 @@ local gui_options = {
         "Magic",
         "Rare",
         "Legendary",
-        "Unique",
-        "Ancestral Legendary",
-        "Ancestral Unique"
+        "Unique"
     },
     behaviors = {
         "Always",
         "Orbwalk"
+    },
+    priorities = {
+        "All",
+        "Sigils+",
+        "Legendary+",
+        "Runes+",
+        "Boss/Uber Only"
     }
 }
 

@@ -57,4 +57,15 @@ function Utils.player_in_zone(zname)
     return world.get_current_zone_name() == zname
 end
 
+function Utils.item_exists(id)
+    if not id then return false end
+    local items = actors_manager.get_all_items()
+    for _, it in pairs(items) do
+       if it:get_id() == id then
+          return true
+       end
+    end
+    return false
+ end
+
 return Utils

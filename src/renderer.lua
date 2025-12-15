@@ -16,16 +16,16 @@ function Renderer.draw_stuff()
 
     local base_pos = get_player_position()
     if Utils.is_inventory_full() then
-        graphics.text_3d("Inventory Full", base_pos, 20, color_red(255))
+        graphics.text_3d("Inventory Full", base_pos, 20, color.new(255, 0, 0, 255))
     end
     if Utils.is_consumable_inventory_full() then
-        graphics.text_3d("Consumable Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 1), 20, color_red(255))
+        graphics.text_3d("Consumable Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 1), 20, color.new(255, 0, 0, 255))
     end
     if Utils.is_socketable_inventory_full() then
-        graphics.text_3d("Socketable Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 2), 20, color_red(255))
+        graphics.text_3d("Socketable Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 2), 20, color.new(255, 0, 0, 255))
     end
     if Utils.is_sigil_inventory_full() then
-        graphics.text_3d("Sigil Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 3), 20, color_red(255))
+        graphics.text_3d("Sigil Inventory Full", vec3:new(base_pos:x(), base_pos:y(), base_pos:z() + 3), 20, color.new(255, 0, 0, 255))
     end
 
     if not settings.draw_wanted_items then return end
@@ -35,18 +35,27 @@ function Renderer.draw_stuff()
         wanted_items_cache = {}
         local items = actors_manager.get_all_items()
         for _, item in pairs(items) do
-            -- Check want item with ignore_distance=true AND ignore_inventory=true
-            if ItemManager.check_want_item(item, true, true) then
-                table.insert(wanted_items_cache, item)
-            end
+            -- Get full debug info
+            local debug_info = ItemManager.get_debug_info(item)
+            -- Check wanted status for coloring
+            local wanted = ItemManager.check_want_item(item, true, true)
+            table.insert(wanted_items_cache, { item = item, wanted = wanted, debug_info = debug_info })
         end
         last_cache_update = current_time
     end
 
-    for _, item in ipairs(wanted_items_cache) do
+    for _, entry in ipairs(wanted_items_cache) do
+        local item = entry.item
+        local wanted = entry.wanted
+        local debug_info = entry.debug_info
+        
         local ok, pos = pcall(function() return item:get_position() end)
         if ok and pos then
-            graphics.circle_3d(pos, 0.5, color_pink(255), 3)
+            local color_val = wanted and color.new(0, 255, 0, 255) or color.new(255, 0, 0, 255)
+            if wanted then
+                graphics.circle_3d(pos, 0.5, color_val, 2)
+            end
+            graphics.text_3d(debug_info, pos, 15, color_val)
         end
     end
 end
