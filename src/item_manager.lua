@@ -98,7 +98,7 @@ local RULES = {
     veiled_crystal = { setting = "veiled_crystal", walkover = true },
     s11_corrupted_essence = { setting = "s11_items", walkover = true },
     event_items = { setting = "event_items", walkover = false, check = "consumable" },
-    boss_items = { setting = "boss_items", walkover = true, check = "consumable", stack = 99 },
+    boss_items = { setting = "boss_items", walkover = false, check = "consumable", stack = 99 },
     rare_elixirs = { setting = "rare_elixirs", walkover = false, check = "consumable", stack = 99 },
     basic_elixirs = { setting = "basic_elixirs", walkover = false, check = "consumable", stack = 99 },
     advanced_elixirs = { setting = "advanced_elixirs", walkover = false, check = "consumable", stack = 99 },
