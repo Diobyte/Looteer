@@ -81,7 +81,7 @@ local RULES = {
     cinders = { setting = "cinders", walkover = true },
     infernal_warp = { setting = "infernal_warp", walkover = true },
     quest = { setting = "quest_items", walkover = false },
-    crafting = { setting = "crafting_items", walkover = true },
+    crafting = { setting = "crafting_items", walkover = false },
     recipe = { setting = "crafting_items", walkover = false, check = "consumable" },
     sigil = { setting = "sigils", walkover = false, check = "sigil" },
     tribute = { setting = "tribute", walkover = false, check = "sigil" },
