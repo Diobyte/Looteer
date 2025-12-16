@@ -43,9 +43,16 @@ local function handle_loot(wanted_item)
 
    TargetManager.reset()
    interact_object(wanted_item)
-   if TargetManager.register_failure(current_id) then
-      TargetManager.clear()
-      return
+   -- Check if item was successfully picked up
+   if Utils.item_exists(current_id) then
+      -- Item still exists, pickup failed (e.g., inventory full)
+      if TargetManager.register_failure(current_id) then
+         TargetManager.clear()
+         return
+      end
+   else
+      -- Pickup successful, reset failure count
+      TargetManager.reset_failure(current_id)
    end
 end
 

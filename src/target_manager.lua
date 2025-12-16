@@ -84,6 +84,12 @@ function TargetManager.register_failure(id)
     return false
 end
 
+function TargetManager.reset_failure(id)
+    if id then
+        failed_loot_attempts[id] = nil
+    end
+end
+
 function TargetManager.prune_failures()
     local now = get_time_since_inject()
     if now - last_prune_time < PRUNE_INTERVAL then return end
