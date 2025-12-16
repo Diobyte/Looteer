@@ -361,13 +361,6 @@ function ItemManager.get_pick_reason_with_flags(item, ignore_distance, ignore_in
    local affixes = item_info:get_affixes()
 
    -- 3. Global Checks
-   if settings.skip_dropped and #affixes > 0 then
-      local ok_row, row = pcall(function() return item_info:get_inventory_row() end)
-      local ok_col, col = pcall(function() return item_info:get_inventory_column() end)
-      if ok_row and ok_col and row and col and row >= 0 and col >= 0 then
-         return false, "Self Dropped", item_info
-      end
-   end
 
    -- 4. Rule Resolution
    local rule = resolve_rule(item, id, item_info)
