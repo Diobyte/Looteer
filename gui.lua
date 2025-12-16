@@ -54,7 +54,7 @@ gui.elements = {
    },
 }
 function gui.render()
-   if not gui.elements.main_tree:push("Looter | Letrico | " .. version) then
+   if not gui.elements.main_tree:push("Looter | Diobyte fork | " .. version) then
       return
    end
 
