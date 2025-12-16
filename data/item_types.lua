@@ -42,7 +42,7 @@ local item_types = {
        end,
     },
     gem = { "amethyst", "emerald", "ruby", "sapphire", "topaz", "skull", "diamond" },
-    s11_special = { "memory", "deceitful", "ancient_memory" }
+    s11_special = { "memory", "deceitful", "ancient_memory", "s11_heavenly_sigil_flippy" }
  }
  
  return item_types
