@@ -120,10 +120,9 @@ end
 -- Category Order for Pattern Matching
 local CATEGORY_ORDER = {
     "cinders", "infernal_warp", "quest", 
-    "recipe", "sigil", "tribute", "compass",
+    "recipe", "s11_special", "sigil", "tribute", "compass",
     "crafting", "item_cache",
     "scroll", "rune", "prism", "gem",
-    "s11_special",
     "equipment"
 }
 
