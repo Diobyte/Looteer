@@ -51,7 +51,9 @@ local function handle_loot(wanted_item)
    end
 
    TargetManager.reset()
-   local ok_interact = pcall(function() interact_object(wanted_item) end)
+   local ok_interact = pcall(function()
+      return loot_manager.interact_with_object(wanted_item)
+   end)
    if not ok_interact then
       ItemManager.blacklist_item(wanted_item, 5.0)
       TargetManager.clear()
