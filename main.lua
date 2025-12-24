@@ -20,8 +20,14 @@ local function handle_loot(wanted_item)
    local player_position = get_player_position()
    if not player_position then return end
 
-   local distance = player_position:dist_to_ignore_z(item_position)
-   local stop_dist = walkover and 0.5 or 2.0
+   -- Safety check: don't loot in dangerous areas
+   if evade.is_dangerous_position(player_position) then
+      return
+   end
+
+   -- Use squared distance for performance (avoids sqrt)
+   local distance_sqr = player_position:squared_dist_to_ignore_z(item_position)
+   local stop_dist_sqr = walkover and (0.5 * 0.5) or (2.0 * 2.0)
 
    if TargetManager.check_timeout(current_id) then
       ItemManager.blacklist_item(wanted_item, 10.0)
@@ -30,7 +36,7 @@ local function handle_loot(wanted_item)
       return
    end
 
-   if distance > stop_dist then
+   if distance_sqr > stop_dist_sqr then
       local prev_id = TargetManager.get_current_id()
       if prev_id ~= current_id then
          explorerlite:set_custom_target(item_position)
@@ -73,9 +79,19 @@ local function handle_loot(wanted_item)
    end
 end
 
+local last_update_time = 0
+local UPDATE_INTERVAL = 0.05 -- 50ms tick rate for smoother operation
+
 local function main_pulse()
    local player = get_local_player()
    if not player then return end
+
+   -- Tick rate limiting for performance
+   local current_time = get_time_since_inject()
+   if current_time - last_update_time < UPDATE_INTERVAL then
+      return
+   end
+   last_update_time = current_time
 
    TargetManager.prune_failures()
 
@@ -96,6 +112,12 @@ local function main_pulse()
 
    local wanted_item = ItemManager.get_item_based_on_priority()
    settings.looting = wanted_item ~= nil
+
+   -- Override auto_play when actively looting to prevent conflicts
+   if wanted_item then
+      auto_play.set_tmp_override(current_time)
+   end
+
    if not wanted_item then
       if TargetManager.get_current_id() then
          TargetManager.clear()
