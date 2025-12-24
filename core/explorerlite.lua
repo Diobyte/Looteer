@@ -3,7 +3,7 @@ MinHeap.__index = MinHeap
 
 function MinHeap.new(compare)
     --console.print("Creating new MinHeap.")
-    return setmetatable({heap = {}, compare = compare or function(a, b) return a < b end}, MinHeap)
+    return setmetatable({ heap = {}, compare = compare or function(a, b) return a < b end }, MinHeap)
 end
 
 function MinHeap:push(value)
@@ -72,19 +72,19 @@ local utils = require "utils.utils"
 local settings = require "core.settings"
 local explorerlite = {
     enabled = false,
-    is_task_running = false, --added to prevent boss dead pathing 
+    is_task_running = false, --added to prevent boss dead pathing
 }
 local target_position = nil
-local grid_size = 0.8            -- Size of grid cells in meters
+local grid_size = 0.8           -- Size of grid cells in meters
 local max_target_distance = 120 -- Maximum distance for a new target
-local target_distance_states = {120, 40, 20, 5}
+local target_distance_states = { 120, 40, 20, 5 }
 local target_distance_index = 1
 local unstuck_target_distance = 15 -- Maximum distance for an unstuck target
-local stuck_threshold = 2      -- Seconds before the character is considered "stuck"
+local stuck_threshold = 2          -- Seconds before the character is considered "stuck"
 local last_position = nil
 local last_move_time = 0
-local stuck_check_interval = 60  -- Check every 2 seconds
-local stuck_distance_threshold = 0.5  -- Consider stuck if moved less than 0.5 units
+local stuck_check_interval = 60      -- Check every 2 seconds
+local stuck_distance_threshold = 0.5 -- Consider stuck if moved less than 0.5 units
 local last_stuck_check_time = 0
 local last_stuck_check_position = nil
 local original_target = nil
@@ -147,6 +147,7 @@ end
 local function find_unstuck_target()
     --console.print("Finding unstuck target.")
     local player_pos = get_player_position()
+    if not player_pos then return nil end
     local valid_targets = {}
 
     for x = -unstuck_target_distance, unstuck_target_distance, grid_size do
@@ -195,7 +196,6 @@ local function handle_stuck_player()
             if temp_target then
                 target_position = temp_target
                 --console.print("Temporary target set: " .. tostring(temp_target))
-
             else
                 --console.print("Failed to find temporary target.")
             end
@@ -215,9 +215,10 @@ end
 
 local function check_walkable_area()
     --console.print("Checking walkable area.")
-    if os.time() % 1 ~= 0 then return end  -- Only run every 5 seconds
+    if os.time() % 1 ~= 0 then return end -- Only run every 5 seconds
 
     local player_pos = get_player_position()
+    if not player_pos then return end
     local check_radius = 15 -- Überprüfungsradius in Metern
 
     for x = -check_radius, check_radius, grid_size do
@@ -329,8 +330,8 @@ local function reconstruct_path(came_from, current)
 
         -- Calculate the angle between directions
         local dot_product = dir1.x * dir2.x + dir1.y * dir2.y
-        local magnitude1 = math.sqrt(dir1.x^2 + dir1.y^2)
-        local magnitude2 = math.sqrt(dir2.x^2 + dir2.y^2)
+        local magnitude1 = math.sqrt(dir1.x ^ 2 + dir1.y ^ 2)
+        local magnitude2 = math.sqrt(dir2.x ^ 2 + dir2.y ^ 2)
         local angle = math.acos(dot_product / (magnitude1 * magnitude2))
 
         -- Use the angle from settings, converting degrees to radians
@@ -411,6 +412,7 @@ local last_a_star_call = 0.0
 local function check_if_stuck()
     --console.print("Checking if character is stuck.")
     local current_pos = get_player_position()
+    if not current_pos then return false end
     local current_time = os.time()
 
     if last_position and calculate_distance(current_pos, last_position) < 0.1 then
@@ -438,10 +440,10 @@ function explorerlite:movement_spell_to_target(target)
     if not local_player then return end
 
     local movement_spell_id = {
-        288106, -- Sorcerer teleport
-        358761, -- Rogue dash
-        355606, -- Rogue shadow step
-        1663206, -- spiritborn hunter 
+        288106,  -- Sorcerer teleport
+        358761,  -- Rogue dash
+        355606,  -- Rogue shadow step
+        1663206, -- spiritborn hunter
         1871821, -- spiritborn soar
     }
 
@@ -467,7 +469,7 @@ end
 
 local function move_to_target()
     if explorerlite.is_task_running then
-        return  -- Do not set a path if a task is running
+        return -- Do not set a path if a task is running
     end
 
     if target_position then
@@ -541,7 +543,6 @@ function explorerlite:move_to_target()
     move_to_target()
 end
 
-
 local last_call_time = 0.0
 on_update(function()
     if not settings.enabled then
@@ -549,7 +550,7 @@ on_update(function()
     end
 
     if explorerlite.is_task_running then
-         return -- Don't run explorer logic if a task is running
+        return  -- Don't run explorer logic if a task is running
     end
 
     local world = world.get_current_world()
