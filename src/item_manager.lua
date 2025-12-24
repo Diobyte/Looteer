@@ -62,10 +62,7 @@ local function check_equipment(item, id, item_info, settings)
     if rarity < min_rarity_id then return false, "Rarity Low" end
 
     if rarity >= 5 then
-        local ok_display, display_name = pcall(function() return item_info:get_display_name() end)
-        if not ok_display or not display_name then return false, "Display Name Error" end
-
-        local greater_affix_count = Utils.get_greater_affix_count(display_name)
+        local greater_affix_count = Utils.get_greater_affix_count(item_info)
         local required_ga_count = 0
 
         if rarity == 5 then
@@ -408,9 +405,6 @@ function ItemManager.calculate_item_score(item, item_info)
     local ok_id, item_id = pcall(function() return item_info:get_sno_id() end)
     if not ok_id or not item_id then return 0 end
 
-    local ok_display, display_name = pcall(function() return item_info:get_display_name() end)
-    if not ok_display or not display_name then return 0 end
-
     local ok_rarity, item_rarity = pcall(function() return item_info:get_rarity() end)
     if not ok_rarity or not item_rarity then return 0 end
 
@@ -421,7 +415,7 @@ function ItemManager.calculate_item_score(item, item_info)
     if CustomItems.boss_items[item_id] or CustomItems.s11_corrupted_essence[item_id] then return 900 end
 
     -- GA items
-    local greater_affix_count = Utils.get_greater_affix_count(display_name)
+    local greater_affix_count = Utils.get_greater_affix_count(item_info)
     if greater_affix_count > 0 then
         return 500 + (greater_affix_count * 100)
     end

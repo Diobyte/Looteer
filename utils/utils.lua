@@ -10,12 +10,17 @@ function Utils.distance_to(object)
    return player_pos:dist_to_ignore_z(obj_pos)
 end
 
-function Utils.get_greater_affix_count(display_name)
-   local count = 0
-   for _ in display_name:gmatch("GreaterAffix") do
-      count = count + 1
+function Utils.get_greater_affix_count(item_info)
+   if not item_info or not item_info:is_valid() then
+      return 0
    end
-   return count
+
+   local ok, count = pcall(function() return item_info:get_attribute("Item_Greater_Affix_Count") end)
+   if ok and count then
+      return math.floor(count)
+   end
+
+   return 0
 end
 
 function Utils.is_lowest_stack_below(inventory, item_id, max_stack, looted_stack)
