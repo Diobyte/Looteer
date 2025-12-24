@@ -68,7 +68,11 @@ local function check_equipment(item, id, item_info, settings)
         local greater_affix_count = Utils.get_greater_affix_count(display_name)
         local required_ga_count = 0
 
-        if rarity == 6 then
+        if rarity == 5 then
+            -- Legendary items
+            required_ga_count = settings.ga_count
+        elseif rarity == 6 then
+            -- Unique items (including Ubers)
             required_ga_count = CustomItems.ubers[id] and settings.uber_unique_ga_count or settings.unique_ga_count
         end
 
