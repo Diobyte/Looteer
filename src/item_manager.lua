@@ -65,6 +65,9 @@ local function check_equipment(item, id, item_info, settings)
         local ok_display, display_name = pcall(function() return item_info:get_display_name() end)
         if not ok_display or not display_name then return false, "Display Name Error" end
 
+        local greater_affix_count = Utils.get_greater_affix_count(display_name)
+        local required_ga_count = 0
+
         if rarity == 6 then
             required_ga_count = CustomItems.ubers[id] and settings.uber_unique_ga_count or settings.unique_ga_count
         end

@@ -31,14 +31,20 @@ local function handle_loot(wanted_item)
    end
 
    if distance > stop_dist then
-      explorerlite:set_custom_target(item_position)
+      local prev_id = TargetManager.get_current_id()
+      if prev_id ~= current_id then
+         explorerlite:set_custom_target(item_position)
+      end
       explorerlite:move_to_target()
       TargetManager.set_target(current_id, walkover)
       return
    end
 
    if walkover then
-      explorerlite:set_custom_target(item_position)
+      local prev_id = TargetManager.get_current_id()
+      if prev_id ~= current_id then
+         explorerlite:set_custom_target(item_position)
+      end
       explorerlite:move_to_target()
       TargetManager.set_target(current_id, true)
       return
