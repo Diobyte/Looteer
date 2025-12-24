@@ -35,7 +35,7 @@ end
 
 function TargetManager.check_timeout(id)
     if current_target.id ~= id then return false end
-    
+
     local timeout = current_target.is_walkover and TIMEOUT_WALKOVER or TIMEOUT_INTERACT
     return (get_time_since_inject() - current_target.started_at > timeout)
 end
@@ -47,29 +47,32 @@ end
 function TargetManager.attempt_unstuck()
     local player_pos = get_player_position()
     if not player_pos then return end
-    
+
     -- Try to move to a random point nearby to clear stuck state
     local angle = math.random() * 6.28318 -- 2*PI
     local dist = 3.0
-    -- Assuming vec3 is available in the environment, otherwise use player_pos methods if available
-    -- If vec3 is not global, we might need to rely on explorerlite's internal logic or just skip this.
-    -- However, most environments provide vec3.
-    if vec3 then
+
+    local ok_unstuck = pcall(function()
         local offset_x = math.cos(angle) * dist
         local offset_y = math.sin(angle) * dist
         local new_pos = vec3:new(player_pos:x() + offset_x, player_pos:y() + offset_y, player_pos:z())
-        
+
         explorerlite:set_custom_target(new_pos)
         explorerlite:move_to_target()
+    end)
+
+    if not ok_unstuck then
+        -- Fallback: just clear path
+        explorerlite:clear_path_and_target()
     end
 end
 
 function TargetManager.register_failure(id)
     if not id then return false end
-    
+
     local now = get_time_since_inject()
     local entry = failed_loot_attempts[id]
-    
+
     if entry and now - entry.last_time <= FAILED_ATTEMPT_WINDOW then
         entry.count = entry.count + 1
         entry.last_time = now
@@ -96,13 +99,20 @@ function TargetManager.prune_failures()
     last_prune_time = now
 
     if not next(failed_loot_attempts) then return end
-    
+
     local active_ids = {}
-    local items = actors_manager.get_all_items()
-    for _, it in pairs(items) do
-        active_ids[it:get_id()] = true
+    local ok_items, items = pcall(function() return actors_manager.get_all_items() end)
+    if ok_items and items then
+        for _, it in pairs(items) do
+            if it then
+                local ok_id, id = pcall(function() return it:get_id() end)
+                if ok_id and id then
+                    active_ids[id] = true
+                end
+            end
+        end
     end
-    
+
     for id in pairs(failed_loot_attempts) do
         if not active_ids[id] then
             failed_loot_attempts[id] = nil

@@ -17,7 +17,10 @@ local function handle_loot(wanted_item)
    end
 
    local walkover = ItemManager.is_walkover_item(wanted_item)
-   local distance = get_player_position():dist_to_ignore_z(item_position)
+   local player_position = get_player_position()
+   if not player_position then return end
+
+   local distance = player_position:dist_to_ignore_z(item_position)
    local stop_dist = walkover and 0.5 or 2.0
 
    if TargetManager.check_timeout(current_id) then
@@ -42,7 +45,13 @@ local function handle_loot(wanted_item)
    end
 
    TargetManager.reset()
-   interact_object(wanted_item)
+   local ok_interact = pcall(function() interact_object(wanted_item) end)
+   if not ok_interact then
+      ItemManager.blacklist_item(wanted_item, 5.0)
+      TargetManager.clear()
+      return
+   end
+
    -- Check if item was successfully picked up
    if Utils.item_exists(current_id) then
       -- Item still exists, pickup failed (e.g., inventory full)
@@ -91,21 +100,21 @@ end
 
 -- Set Global access for other plugins
 LooteerPlugin = {
-   getSettings = function (setting)
+   getSettings = function(setting)
       if Settings.get()[setting] then
-          return Settings.get()[setting]
+         return Settings.get()[setting]
       else
-          return nil
+         return nil
       end
-  end,
-  setSettings = function (setting, value)
+   end,
+   setSettings = function(setting, value)
       if Settings.get()[setting] then
-          Settings.get()[setting] = value
-          return true
+         Settings.get()[setting] = value
+         return true
       else
-          return false
+         return false
       end
-  end,
+   end,
 }
 
 on_update(main_pulse)
