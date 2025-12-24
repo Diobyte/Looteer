@@ -64,7 +64,23 @@ function Renderer.draw_stuff()
             if wanted then
                 graphics.circle_3d(pos, 0.5, color_val, 2)
             end
-            graphics.text_3d(debug_info, pos, 15, color_val)
+
+            -- Convert 3D position to 2D screen coordinates
+            local screen_pos = graphics.w2s(pos)
+            if screen_pos and not screen_pos:is_zero() then
+                -- Parse the debug_info string and split into lines
+                local parts = {}
+                for part in string.gmatch(debug_info, "[^|]+") do
+                    table.insert(parts, part:match("^%s*(.-)%s*$")) -- Trim whitespace
+                end
+
+                -- Draw each part on a separate line with vertical offset
+                local base_y = screen_pos.y
+                for i, text in ipairs(parts) do
+                    local line_pos = vec2.new(screen_pos.x, base_y + (i - 1) * 15)
+                    graphics.text_2d(text, line_pos, 12, color_val)
+                end
+            end
         end
     end
 end
